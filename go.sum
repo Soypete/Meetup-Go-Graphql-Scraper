@@ -9,6 +9,10 @@ github.com/graphql-go/graphql v0.8.0 h1:JHRQMeQjofwqVvGwYnr8JnPTY0AxgVy1HpHSGPLd
 github.com/graphql-go/graphql v0.8.0/go.mod h1:nKiHzRM0qopJEwCITUuIsxk9PlVlwIiiI8pnJEhordQ=
 github.com/kollalabs/sdk-go v0.3.0 h1:UBso1qSJSE2jyZk7mLkYNB7smxmkXpRXYQk7yONRTTg=
 github.com/kollalabs/sdk-go v0.3.0/go.mod h1:Nlwr7iEJY98hZW2JqloL6U83UynxyW97wFxHou6bX6M=
+github.com/machinebox/graphql v0.2.2 h1:dWKpJligYKhYKO5A2gvNhkJdQMNZeChZYyBbrZkBZfo=
+github.com/machinebox/graphql v0.2.2/go.mod h1:F+kbVMHuwrQ5tYgU9JXlnskM8nOaFxCAEolaQybkjWA=
+github.com/pkg/errors v0.9.1 h1:FEBLx1zS214owpjy7qsBeixbURkuhQAwrK5UwLGTwt4=
+github.com/pkg/errors v0.9.1/go.mod h1:bwawxfHBFNV+L2hUp1rHADufV3IMtnDRdf1r5NINEl0=
 golang.org/x/crypto v0.0.0-20190308221718-c2843e01d9a2/go.mod h1:djNgcEr1/C05ACkg1iLfiJU5Ep61QUkGW8qpdssI0+w=
 golang.org/x/net v0.0.0-20190603091049-60506f45cf65/go.mod h1:HSz+uSET+XFnRR8LxR5pz3Of3rY3CfYBVs4xY44aLks=
 golang.org/x/net v0.2.0 h1:sZfSu1wtKLGlWI4ZZayP0ck9Y73K1ynO6gqzTdBVdPU=

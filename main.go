@@ -2,13 +2,12 @@ package main
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"log"
 	"os"
 
-	"github.com/graphql-go/graphql"
 	"github.com/kollalabs/sdk-go/kc"
+	"github.com/machinebox/graphql"
 )
 
 func getBearerToken() (string, error) {
@@ -37,39 +36,34 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	ctx := context.WithValue(context.Background(), "Authorization", bearerToken)
+	client := graphql.NewClient("https://api.meetup.com/gql")
 
-	// make graphql query
-	// query := `
-	// {
-	// 	checkIfGroupUrlnameValid(urlname: "utahgophers") {
-	// 		isValid
-	// 		urlname
-	// 		error
-	// 	}
-	// }
-	// `
-	query := `
-{
-	self {
-		memberships
-		tickets
-		id
-		name
-	}
-}
-`
+	// make a request
+	req := graphql.NewRequest(`
+    query {
+        self {
+           id 
+           name 
+        }
+    }
+`)
 
-	// execute graphql request
-	params := graphql.Params{RequestString: query, Context: ctx}
-	r := graphql.Do(params)
-	if len(r.Errors) > 0 {
-		log.Fatalf("failed to execute graphql operation, errors: %+v", r.Errors)
-	}
-	rJSON, err := json.Marshal(r)
-	if err != nil {
-		log.Fatalf("failed to unmarshal graphql respons : %+v", err)
-	}
+	// set header fields
+	req.Header.Add("Authorization", bearerToken)
 
-	fmt.Printf("%s \n", rJSON)
+	// define a Context for the request
+	ctx := context.Background()
+
+	// run it and capture the response
+	type Data struct {
+		Self struct {
+			ID   int    `json:"id"`
+			Name string `json:"name"`
+		} `json:"self"`
+	}
+	var respData Data
+	if err := client.Run(ctx, req, &respData); err != nil {
+		log.Fatal(err)
+	}
+	fmt.Println(respData)
 }
