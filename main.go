@@ -1,221 +1,87 @@
 package main
 
 import (
-	"bytes"
-	"context"
-	"encoding/json"
 	"fmt"
-	"io"
 	"log"
-	"net/http"
-	"os"
-	"time"
 
-	"github.com/kollalabs/sdk-go/kc"
+	"github.com/soypete/Metup-Go-Graphql-Scraper/auth"
+	"github.com/soypete/Metup-Go-Graphql-Scraper/meetup"
 )
 
-type payloadql struct {
-	Query     string `json:"query"`
-	Variables string `json:"variables"`
-}
-
-type ProNetworkByUrlname struct {
-	Data struct {
-		ProNetwork struct {
-			GroupsSearch GroupsSearch `json:"groupsSearch,omitempty"`
-			EventsSearch EventsSearch `json:"eventsSearch,omitempty"`
-		} `json:"proNetworkByUrlname"`
-	} `json:"data"`
-}
-type GroupsSearch struct {
-	Count    int `json:"count"`
-	PageInfo struct {
-		HasNextPage bool   `json:"hasNextPage"`
-		StartCursor string `json:"startCursor"`
-		EndCursor   string `json:"endCursor"`
-	} `json:"pageInfo"`
-	Edges []struct {
-		Node struct {
-			ID   string `json:"id"`
-			Name string `json:"name"`
-		} `json:"node"`
-	} `json:"edges"`
-}
-
-type EventsSearch struct {
-	Count    int `json:"count"`
-	PageInfo struct {
-		HasNextPage bool   `json:"hasNextPage"`
-		StartCursor string `json:"startCursor"`
-		EndCursor   string `json:"endCursor"`
-	} `json:"pageInfo"`
-	Edges []struct {
-		Node struct {
-			ID    string `json:"id"`
-			Title string `json:"title"`
-			Group struct {
-				ID   string `json:"id"`
-				Name string `json:"name"`
-			} `json:"group"`
-			DateTime string `json:"dateTime"`
-		} `json:"node"`
-	} `json:"edges"`
-}
-
-func getBearerToken() (string, error) {
-	// Get api key from environment variable
-
-	// TODO(soypete 03-27-2023): rename to kolla key
-	apiKey := os.Getenv("KOLLA_KEY")
-	ctx := context.Background()
-
-	if apiKey == "" {
-		return "", fmt.Errorf("no kolla key provided.")
-	}
-	// Create a new client
-	kolla, err := kc.New(apiKey)
-	if err != nil {
-		return "", fmt.Errorf("unable to load kolla connect client: %s", err)
-	}
-	// Get consumer token
-	// TODO(soypete 03-27-2023): update names to correspond wiht kolla api
-	if err != nil {
-		return "", fmt.Errorf("unable to load consumer token: %s", err)
-	}
-	creds, err := kolla.Credentials(ctx, os.Getenv("CONNECTOR_ID"), os.Getenv("CONSUMER_ID"))
-	if err != nil {
-		return "", fmt.Errorf("unable to load consumer token: %s", err)
-	}
-
-	return fmt.Sprintf("Bearer %s", creds.Token), nil
-}
-
-func getListOfGroups(bearerToken string) {
-	query := `query ($urlname: String!) { 
-		proNetworkByUrlname(urlname: $urlname) { 
-			groupsSearch(input: {first: 3}) {
-      count
-      pageInfo {
-				hasNextPage
-				startCursor
-        endCursor
-      }
-      edges {
-        node {
-          id
-          name
-				} 
-			} 
-		} 
-	} 
-}
-  `
-	variables := `{"urlname":"forge-utah"}`
-	p := payloadql{
-		Query:     query,
-		Variables: variables,
-	}
-	b, err := json.Marshal(p)
-	if err != nil {
-		log.Fatal(err)
-	}
-	req, err := http.NewRequest("POST", "https://api.meetup.com/gql", bytes.NewReader(b))
-	if err != nil {
-		log.Fatal(err)
-	}
-	// set header fields
-	req.Header.Add("Authorization", bearerToken)
-	req.Header.Add("Content-Type", "application/json")
-	client := http.Client{
-		Timeout: time.Second * 10,
-	}
-
-	resp, err := client.Do(req)
-	if err != nil {
-		log.Fatal(err)
-	}
-	// run it and capture the response
-	var respData ProNetworkByUrlname
-
-	body, err := io.ReadAll(resp.Body)
-	if err != nil {
-		log.Fatal(err)
-	}
-	err = json.Unmarshal(body, &respData)
-	if err != nil {
-		log.Fatal(err)
-	}
-	meetupGroupIds := respData.Data.ProNetwork.GroupsSearch.Edges
-	fmt.Print(meetupGroupIds)
-}
-
-func getListOfEvents(bearerToken string) {
-	query := `query ($urlname: String!) { 
-		proNetworkByUrlname(urlname: $urlname) { 
-			eventsSearch(input: {first: 3}) {
-      count
-      pageInfo {
-				hasNextPage
-				startCursor
-        endCursor
-      }
-      edges {
-        node {
-          id
-         	title
-					group {
-						id
-						name
-					}
-					dateTime
-				} 
-			} 
-		} 
-	} 
-}
-  `
-	variables := `{"urlname":"forge-utah"}`
-	p := payloadql{
-		Query:     query,
-		Variables: variables,
-	}
-	b, err := json.Marshal(p)
-	if err != nil {
-		log.Fatal(err)
-	}
-	req, err := http.NewRequest("POST", "https://api.meetup.com/gql", bytes.NewReader(b))
-	if err != nil {
-		log.Fatal(err)
-	}
-	// set header fields
-	req.Header.Add("Authorization", bearerToken)
-	req.Header.Add("Content-Type", "application/json")
-	client := http.Client{
-		Timeout: time.Second * 10,
-	}
-
-	resp, err := client.Do(req)
-	if err != nil {
-		log.Fatal(err)
-	}
-	// run it and capture the response
-	var respData ProNetworkByUrlname
-
-	body, err := io.ReadAll(resp.Body)
-	if err != nil {
-		log.Fatal(err)
-	}
-	err = json.Unmarshal(body, &respData)
-	if err != nil {
-		log.Fatal(err)
-	}
-	fmt.Printf("number of events %d\n", len(respData.Data.ProNetwork.EventsSearch.Edges))
-}
 func main() {
-	bearerToken, err := getBearerToken()
+	bearerToken, err := auth.GetBearerToken()
 	if err != nil {
 		log.Fatal(err)
 	}
-	getListOfGroups(bearerToken)
-	getListOfEvents(bearerToken)
+	meetupClient := meetup.Setup(bearerToken)
+
+	// TODO(soypete): create csv with relevant data.
+	// for list of data in README.md
+	err = buildDataSet(meetupClient)
+	if err != nil {
+		log.Fatal(err)
+	}
+}
+
+type analytics struct {
+	Groups map[string]groupAnalytics // key in the group's meetup ID
+}
+type groupAnalytics struct {
+	ID     string
+	Name   string
+	Events map[string]eventAnalytics // key is the group's meetup ID
+}
+
+type eventAnalytics struct {
+	ID      string
+	Title   string
+	Date    string
+	RSVPNum int
+}
+
+func buildDataSet(meetupClient meetup.Client) error {
+	// TODO: add pagination
+	groups := meetupClient.GetListOfGroups()
+	events := meetupClient.GetListOfEvents()
+	var a analytics
+	groupMap := make(map[string]groupAnalytics)
+	for _, g := range groups.Data.ProNetwork.GroupsSearch.Edges {
+		if _, ok := groupMap[g.Node.ID]; ok {
+			continue
+		}
+		groupMap[g.Node.ID] = groupAnalytics{
+			ID:   g.Node.ID,
+			Name: g.Node.Name,
+		}
+	}
+	eventMap := make(map[string]eventAnalytics)
+	for _, e := range events.Data.ProNetwork.EventsSearch.Edges {
+		var ok bool
+		if _, ok = eventMap[e.Node.ID]; ok {
+			continue
+		}
+		eventMap[e.Node.ID] = eventAnalytics{
+			ID:    e.Node.ID,
+			Title: e.Node.Title,
+			Date:  e.Node.DateTime,
+		}
+		var g groupAnalytics
+		if g, ok = groupMap[e.Node.Group.ID]; !ok {
+			g.Events = make(map[string]eventAnalytics)
+			g.Events[e.Node.ID] = eventAnalytics{
+				ID:    e.Node.ID,
+				Title: e.Node.Title,
+				Date:  e.Node.DateTime,
+			}
+		}
+		g.Events[e.Node.ID] = eventAnalytics{
+			ID:    e.Node.ID,
+			Title: e.Node.Title,
+			Date:  e.Node.DateTime,
+		}
+		groupMap[e.Node.Group.ID] = g
+	}
+	a.Groups = groupMap
+	fmt.Println(a.Groups)
+	return nil
 }
