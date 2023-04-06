@@ -77,74 +77,61 @@ type EventsSearch struct {
 	Edges []Edge `json:"edges"`
 }
 
-func (c Client) GetListOfGroups() ProNetworkByUrlname {
-	query := `query ($urlname: String!) { 
-		proNetworkByUrlname(urlname: $urlname) { 
-			groupsSearch(input: {first: 3}) {
-      count
-      pageInfo {
-				hasNextPage
-				startCursor
-        endCursor
-      }
-      edges {
-        node {
-          id
-          name
-				} 
-			} 
-		} 
-	} 
+// TODO(soypete): edit variables
+func getInputandVariables(isFirst bool, lastCursor, urlname string, numPerPage int) (string, string) {
+	if isFirst {
+		return "input: {first: $itemsNum}", fmt.Sprintf(`{"urlname":"%s","itemsNum": %d}`, urlname, numPerPage)
+	}
+	return "input: {first: $itemsNum, after: $cursor}", fmt.Sprintf(`{"urlname":"%s","itemsNum": %d,"cursor": "%s"}`, urlname, numPerPage, lastCursor)
+
 }
-  `
-	variables := `{"urlname":"forge-utah"}`
+
+var queryTemplate = `query (%s) { proNetworkByUrlname(urlname: $urlname) { %s(%s) {count pageInfo { hasNextPage startCursor endCursor } edges { node { id %s } } } }}`
+
+func makePayloadql(isGroup, isfirst bool, lastCursor, urlname string, numPerPage int) payloadql {
+	variableTypes := "$urlname: String!, $itemsNum: Int!"
+	if !isfirst {
+		variableTypes = variableTypes + ", $cursor: String!"
+	}
+	searchType := `eventsSearch`
+	nodeQuery := `title group { id name } dateTime`
+	if isGroup {
+		searchType = `groupsSearch`
+		nodeQuery = `name`
+	}
+
+	input, variables := getInputandVariables(isfirst, lastCursor, "forge-utah", 3)
+	query := fmt.Sprintf(queryTemplate, variableTypes, searchType, input, nodeQuery)
 	p := payloadql{
 		Query:     query,
 		Variables: variables,
 	}
-
+	return p
+}
+func (c Client) GetListOfGroups(cursor string) (ProNetworkByUrlname, error) {
+	isFirst := true
+	if cursor != "" {
+		isFirst = false
+	}
+	p := makePayloadql(true, isFirst, cursor, "forge-utah", 3)
 	body, err := c.sendRequest(p)
 	if err != nil {
-		log.Fatal(err)
+		return ProNetworkByUrlname{}, err
 	}
 	var respData ProNetworkByUrlname
 	err = json.Unmarshal(body, &respData)
 	if err != nil {
-		log.Fatal(err)
+		return ProNetworkByUrlname{}, err
 	}
-	return respData
+	return respData, nil
 }
 
-func (c Client) GetListOfEvents() ProNetworkByUrlname {
-	query := `query ($urlname: String!) { 
-		proNetworkByUrlname(urlname: $urlname) { 
-			eventsSearch(input: {first: 3}) {
-      count
-      pageInfo {
-				hasNextPage
-				startCursor
-        endCursor
-      }
-      edges {
-        node {
-          id
-         	title
-					group {
-						id
-						name
-					}
-					dateTime
-				} 
-			} 
-		} 
-	} 
-}
-  `
-	variables := `{"urlname":"forge-utah"}`
-	p := payloadql{
-		Query:     query,
-		Variables: variables,
+func (c Client) GetListOfEvents(cursor string) ProNetworkByUrlname {
+	isFirst := true
+	if cursor != "" {
+		isFirst = false
 	}
+	p := makePayloadql(false, isFirst, cursor, "forge-utah", 3)
 	body, err := c.sendRequest(p)
 	if err != nil {
 		log.Fatal(err)

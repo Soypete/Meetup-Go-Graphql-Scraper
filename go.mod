@@ -6,6 +6,7 @@ require github.com/kollalabs/sdk-go v0.3.0
 
 require (
 	github.com/antihax/optional v1.0.0 // indirect
+	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/golang/protobuf v1.5.2 // indirect
 	golang.org/x/net v0.7.0 // indirect
 	golang.org/x/oauth2 v0.2.0 // indirect
