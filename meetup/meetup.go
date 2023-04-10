@@ -65,6 +65,8 @@ type Node struct {
 		Name string `json:"name,omitempty"`
 	} `json:"group,omitempty"`
 	DateTime string `json:"dateTime,omitempty"`
+	Going    int    `json:"going,omitempty"`
+	Waiting  int    `json:"waiting,omitempty"`
 }
 
 type EventsSearch struct {
@@ -94,7 +96,7 @@ func makePayloadql(isGroup, isfirst bool, lastCursor, urlname string, numPerPage
 		variableTypes = variableTypes + ", $cursor: String!"
 	}
 	searchType := `eventsSearch`
-	nodeQuery := `title group { id name } dateTime`
+	nodeQuery := `title group { id name } dateTime going waiting`
 	if isGroup {
 		searchType = `groupsSearch`
 		nodeQuery = `name`

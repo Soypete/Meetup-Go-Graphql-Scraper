@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"strconv"
 )
 
 type groupAnalytics struct {
@@ -50,7 +51,7 @@ func (m Client) BuildDataSet() error {
 	defer csvFile.Close()
 	csvWriter := csv.NewWriter(csvFile)
 	// write csv column names
-	err = csvWriter.Write([]string{"event_id", "title", "date", "group_id", "group_name"})
+	err = csvWriter.Write([]string{"event_id", "title", "date", "rsvp_num_going", "rsvp_num_waitlist", "group_id", "group_name"})
 	if err != nil {
 		return fmt.Errorf("could not write headers to csv file, %w", err)
 	}
@@ -61,7 +62,7 @@ func (m Client) BuildDataSet() error {
 	for hasNextPage {
 		events := m.GetListOfEvents(cursor)
 		for _, e := range events.Data.ProNetwork.EventsSearch.Edges {
-			err = csvWriter.Write([]string{e.Node.ID, e.Node.Title, e.Node.DateTime, e.Node.Group.ID, groupMap[e.Node.Group.ID].Name})
+			err = csvWriter.Write([]string{e.Node.ID, e.Node.Title, e.Node.DateTime, strconv.Itoa(e.Node.Going), strconv.Itoa(e.Node.Waiting), e.Node.Group.ID, groupMap[e.Node.Group.ID].Name})
 			if err != nil {
 				log.Printf("failed to write data for event %s, %v", e.Node.ID, err)
 			}
