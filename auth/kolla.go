@@ -30,6 +30,7 @@ func GetBearerToken() (string, error) {
 	if err != nil {
 		return "", fmt.Errorf("unable to load consumer token: %s", err)
 	}
+	fmt.Println(creds.Token)
 
 	return fmt.Sprintf("Bearer %s", creds.Token), nil
 }
