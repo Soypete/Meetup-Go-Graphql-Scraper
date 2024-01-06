@@ -5,7 +5,9 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"regexp"
 	"strconv"
+	"time"
 )
 
 type groupAnalytics struct {
@@ -22,6 +24,7 @@ func (m Client) getGroups() map[string]groupAnalytics {
 		if err != nil {
 			log.Fatal(err)
 		}
+
 		for _, g := range groups.Data.ProNetwork.GroupsSearch.Edges {
 			if _, ok := groupMap[g.Node.ID]; ok {
 				continue
@@ -62,6 +65,32 @@ func (m Client) BuildDataSet() error {
 	for hasNextPage {
 		events := m.GetListOfEvents(cursor)
 		for _, e := range events.Data.ProNetwork.EventsSearch.Edges {
+			// TODO(soypete): add parsing for this format "2024-01-15T19:30Z"
+			// write to the DuckDB
+			//2018-07-01T12:00:00-04:00
+			//2023-10-12T18:00+02:00
+			formatWithSeconds := "2006-01-02T15:04:05-07:00"
+			formatWithoutSeconds := "2006-01-02T15:04-07:00"
+
+			var eventDate time.Time
+			var err error
+			// compile to regexp if this works
+			if match, _ := regexp.MatchString(formatWithSeconds, e.Node.DateTime); match {
+				eventDate, err = time.Parse(formatWithSeconds, e.Node.DateTime)
+				if err != nil {
+					log.Printf("failed to parse date for event %s, %v\n", e.Node.ID, err)
+				}
+			} else {
+				eventDate, err = time.Parse(formatWithoutSeconds, e.Node.DateTime)
+				if err != nil {
+					log.Printf("failed to parse date for event %s, %v\n", e.Node.ID, err)
+				}
+			}
+			err = m.warehouse.InsertEvent(e.Node.ID, e.Node.Title, e.Node.Group.ID, e.Node.Group.Name, eventDate, e.Node.Going, e.Node.Waiting)
+			if err != nil {
+				log.Printf("failed to insert event %s, %v\n", e.Node.ID, err)
+			}
+
 			err = csvWriter.Write([]string{e.Node.ID, e.Node.Title, e.Node.DateTime, strconv.Itoa(e.Node.Going), strconv.Itoa(e.Node.Waiting), e.Node.Group.ID, groupMap[e.Node.Group.ID].Name})
 			if err != nil {
 				log.Printf("failed to write data for event %s, %v", e.Node.ID, err)

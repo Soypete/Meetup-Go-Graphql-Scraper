@@ -8,6 +8,7 @@ import (
 	"os"
 
 	"github.com/soypete/Metup-Go-Graphql-Scraper/auth"
+	"github.com/soypete/Metup-Go-Graphql-Scraper/db"
 	"github.com/soypete/Metup-Go-Graphql-Scraper/meetup"
 )
 
@@ -37,16 +38,23 @@ func main() {
 	flag.StringVar(&configPath, "config-path", "config.json", "config file path")
 	flag.Parse()
 
+	// parse config file
 	parsedConfig, err := parseConfig(configPath)
 	if err != nil {
 		log.Fatal(err)
 	}
+	// get meetup bearer token
 	kc := auth.Setup(parsedConfig.Key, parsedConfig.ConsumerID, parsedConfig.ConnectorID)
 	bearerToken, err := kc.GetBearerToken()
 	if err != nil {
 		log.Fatal(err)
 	}
-	meetupClient := meetup.Setup(bearerToken, parsedConfig.ProAccount)
+	// setup Duck db
+	db, err := db.Setup("meetup.db")
+	if err != nil {
+		log.Fatal(err)
+	}
+	meetupClient := meetup.Setup(bearerToken, parsedConfig.ProAccount, db)
 
 	// TODO(soypete): create csv with relevant data.
 	// for list of data in README.md
