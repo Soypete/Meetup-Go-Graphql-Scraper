@@ -11,6 +11,8 @@ import (
 	"log"
 	"net/http"
 	"time"
+
+	"github.com/soypete/Metup-Go-Graphql-Scraper/db"
 )
 
 // Client connects all information for connecting to the Meetup API.
@@ -19,9 +21,10 @@ type Client struct {
 	ql          *http.Client
 	bearerToken string //TODO(soypete): refresh
 	url         string
+	warehouse   db.Warehouse
 }
 
-func Setup(bearerToken string, proname string) Client {
+func Setup(bearerToken string, proname string, warehouse db.Warehouse) Client {
 	return Client{
 		proname: proname,
 		ql: &http.Client{
@@ -29,6 +32,7 @@ func Setup(bearerToken string, proname string) Client {
 		},
 		bearerToken: bearerToken,
 		url:         "https://api.meetup.com/gql",
+		warehouse:   warehouse,
 	}
 }
 
