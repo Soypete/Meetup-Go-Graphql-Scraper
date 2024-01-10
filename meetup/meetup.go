@@ -13,20 +13,17 @@ import (
 	"time"
 )
 
-var (
-	// proname = "forge-utah"
-	proname = "go"
-)
-
 // Client connects all information for connecting to the Meetup API.
 type Client struct {
+	proname     string
 	ql          *http.Client
 	bearerToken string //TODO(soypete): refresh
 	url         string
 }
 
-func Setup(bearerToken string) Client {
+func Setup(bearerToken string, proname string) Client {
 	return Client{
+		proname: proname,
 		ql: &http.Client{
 			Timeout: 10 * time.Second,
 		},
@@ -107,7 +104,7 @@ func makePayloadql(isGroup, isfirst bool, lastCursor, urlname string, numPerPage
 		nodeQuery = `name`
 	}
 
-	input, variables := getInputandVariables(isfirst, lastCursor, proname, 3)
+	input, variables := getInputandVariables(isfirst, lastCursor, urlname, 3)
 	query := fmt.Sprintf(queryTemplate, variableTypes, searchType, input, nodeQuery)
 	p := payloadql{
 		Query:     query,
@@ -120,7 +117,7 @@ func (c Client) GetListOfGroups(cursor string) (ProNetworkByUrlname, error) {
 	if cursor != "" {
 		isFirst = false
 	}
-	p := makePayloadql(true, isFirst, cursor, proname, 3)
+	p := makePayloadql(true, isFirst, cursor, c.proname, 3)
 	body, err := c.sendRequest(p)
 	if err != nil {
 		return ProNetworkByUrlname{}, err
@@ -138,7 +135,7 @@ func (c Client) GetListOfEvents(cursor string) ProNetworkByUrlname {
 	if cursor != "" {
 		isFirst = false
 	}
-	p := makePayloadql(false, isFirst, cursor, proname, 3)
+	p := makePayloadql(false, isFirst, cursor, c.proname, 3)
 	body, err := c.sendRequest(p)
 	if err != nil {
 		log.Fatal(err)

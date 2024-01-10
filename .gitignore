@@ -15,3 +15,5 @@
 .secrets
 dev/
 *.csv
+# secrets file for connecting to meetup
+*.json
