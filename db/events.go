@@ -7,7 +7,7 @@ import (
 
 func (w Warehouse) InsertEvent(id, title, groupID, groupName string, date time.Time, going, waiting int) error {
 	query := `
-	INSERT INTO events (id, title, date, going, waiting, group_id, group_name)
+	INSERT OR REPLACE INTO events (id, title, date, going, waiting, group_id, group_name)
 	VALUES (?,?,?,?,?,?,?);
 	`
 	_, err := w.db.Exec(query, id, title, date, going, waiting, groupID, groupName)
