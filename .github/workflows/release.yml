@@ -18,9 +18,10 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      - name: Set uo Clib build env
-        run: |
-          sudo apt-get install gcc-multilib # install headerfiles for duckDB cgo
+      # - name: Set uo Clib build env
+      #   run: |
+      #     sudo apt-get update
+          # sudo apt-get install gcc-multilib # install headerfiles for duckDB cgo
       - name: Set up Go
         uses: actions/setup-go@v4
         with:
