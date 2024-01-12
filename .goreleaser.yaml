@@ -11,8 +11,8 @@ version: 1
 before:
   hooks:
     # You may remove this if you don't use go modules.
-    - go download
-    # - go get github.com/marcboeker/go-duckdb 
+    # - go download
+    - go get github.com/marcboeker/go-duckdb 
     - go mod tidy
 
 builds:
