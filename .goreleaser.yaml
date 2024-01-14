@@ -48,7 +48,7 @@ archives:
   - id: golang-cross
     builds:
       - darwin
-      - linux-pi
+      # - linux-pi
   - format: tar.gz
     # this name template makes the OS and Arch compatible with the results of `uname`.
     name_template: >-
