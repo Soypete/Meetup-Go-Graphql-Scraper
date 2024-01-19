@@ -21,3 +21,5 @@ dev/
 *.wal
 
 dist/
+duckdb
+duckdb-osx
