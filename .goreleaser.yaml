@@ -16,8 +16,8 @@ builds:
     goarch:
       - arm64
     env:
-      - CC=o64-clang
-      - CXX=o64-clang++
+      - CC=oa64-clang
+      - CXX=oa64-clang++
     flags:
       - -mod=readonly
     ldflags:
