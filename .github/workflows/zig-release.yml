@@ -14,6 +14,9 @@ jobs:
   release:
     runs-on: ubuntu-latest
     steps:
+      - run: |
+          apt-get update
+          gcc-arm-linux-gnueabihf
       - uses: actions/checkout@v4
         # with:
           # fetch-depth: 0 # this is important, otherwise it won't checkout the full tree (i.e. no previous tags)
