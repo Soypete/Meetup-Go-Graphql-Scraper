@@ -15,7 +15,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - run: |
-          apt-get update \
+          apt-get update 
           apt-get gcc-arm-linux-gnueabihf
       - uses: actions/checkout@v4
         # with:
