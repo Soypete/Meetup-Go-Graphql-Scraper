@@ -5,11 +5,7 @@ on:
   push:
     # run only against tags
     tags:
-      - "*"
-
-permissions:
-  contents: write
-
+      - v*
 jobs:
   goreleaser:
     runs-on: ubuntu-latest
@@ -17,7 +13,8 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0
+          submodules: 'true'
+      - run: git fetch --prune --unshallow
       # - name: Set uo Clib build env
       #   run: |
       #     sudo apt-get update
@@ -26,12 +23,10 @@ jobs:
         uses: actions/setup-go@v4
         with:
           go-version: 1.21
-      - name: Run GoReleaser
-        uses: goreleaser/goreleaser-action@v5
-        with:
-          version: latest
-          args: release --clean
+      - name: release dry run
+        run: make release-dry-run
+      - name: release publish
+        run: make release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          # Your GoReleaser Pro key, if you are using the 'goreleaser-pro' distribution
-          # GORELEASER_KEY: ${{ secrets.GORELEASER_KEY }}
+
