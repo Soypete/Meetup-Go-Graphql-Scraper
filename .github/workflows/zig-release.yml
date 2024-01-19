@@ -2,6 +2,7 @@ name: zigrelease
 
 # run only on tags
 on:
+  pull_request:
   push:
     tags:
       - 'v*'
@@ -14,14 +15,17 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-        with:
+        # with:
           # fetch-depth: 0 # this is important, otherwise it won't checkout the full tree (i.e. no previous tags)
-      - uses: actions/setup-go@v4
+      - name: Set up Go
+        uses: actions/setup-go@v4
         with:
           go-version-file: go.mod
           cache: true
-      - uses: goto-bus-stop/setup-zig@v2
-      - uses: goreleaser/goreleaser-action@v4          # run goreleaser
+      - name: Set up Zig
+        uses: goto-bus-stop/setup-zig@v2
+      - name: Go Releaser
+        uses: goreleaser/goreleaser-action@v4          # run goreleaser
         with:
           version: latest
           args: release --clean

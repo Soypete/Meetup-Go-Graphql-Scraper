@@ -6,6 +6,9 @@ on:
     # run only against tags
     tags:
       - v*
+permissions:
+   contents: write # needed to write releases
+
 jobs:
   goreleaser:
     runs-on: ubuntu-latest
