@@ -28,7 +28,7 @@ builds:
     goos:
       - linux
     goarch:
-      - armhf
+      - arm64
     goarm:
       - 7
     env:
