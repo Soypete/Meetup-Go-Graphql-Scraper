@@ -34,8 +34,8 @@ builds:
     env:
       - CC=arm-linux-gnueabihf-gcc
       - CXX=arm-linux-gnueabihf-g++
-      - CGO_CFLAGS="-arch arm64"
-      - CGO_LDFLAGS="-arch arm64"
+      - CGO_CFLAGS=-arch=amd64
+      - CGO_LDFLAGS=-arch=arm64
     flags:
       - -mod=readonly
     ldflags:
