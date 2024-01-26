@@ -5,10 +5,7 @@ import (
 	"fmt"
 	"log"
 	"os"
-	"regexp"
 	"strconv"
-	"strings"
-	"time"
 )
 
 type groupAnalytics struct {
@@ -66,41 +63,8 @@ func (m Client) BuildDataSet() error {
 	for hasNextPage {
 		events := m.GetListOfEvents(cursor)
 		for _, e := range events.Data.ProNetwork.EventsSearch.Edges {
-			// write to the DuckDB
-			formatWithSeconds := "2006-01-02T15:04:05-07:00"
-			formatWithoutSeconds := "2006-01-02T15:04-07:00"
-			// formatWithSecondsUTC := "2006-01-02T15:04:05Z"
-			formatWithoutSecondsUTC := "2006-01-02T15:04Z"
-
-			var eventDate time.Time
-			var err error
-			// compile to regexp if this works
-			if strings.Contains(e.Node.DateTime, "Z") {
-				eventDate, err = time.Parse(formatWithoutSecondsUTC, e.Node.DateTime)
-				if err != nil {
-					log.Printf("failed to parse date for event %s, %v\n", e.Node.ID, err)
-				}
-			} else {
-				re := regexp.MustCompile(`\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}-\d{2}:\d{2}`) // 2019-02-07T18:00:00-05:00
-				if re.MatchString(e.Node.DateTime) {
-					eventDate, err = time.Parse(formatWithSeconds, e.Node.DateTime)
-					if err != nil {
-						log.Printf("failed to parse date for event %s, %v\n", e.Node.ID, err)
-					}
-				} else {
-					eventDate, err = time.Parse(formatWithoutSeconds, e.Node.DateTime)
-					if err != nil {
-						log.Printf("failed to parse date for event %s, %v\n", e.Node.ID, err)
-					}
-				}
-			}
-
-			err = m.warehouse.InsertEvent(e.Node.ID, e.Node.Title, e.Node.Group.ID, e.Node.Group.Name, eventDate, e.Node.Going, e.Node.Waiting)
-			if err != nil {
-				log.Printf("failed to insert event %s, %v\n", e.Node.ID, err)
-			}
-
-			err = csvWriter.Write([]string{e.Node.ID, e.Node.Title, e.Node.DateTime, strconv.Itoa(e.Node.Going), strconv.Itoa(e.Node.Waiting), e.Node.Group.ID, groupMap[e.Node.Group.ID].Name})
+			// TODO: add headers to the csv file
+			err := csvWriter.Write([]string{e.Node.ID, e.Node.Title, e.Node.DateTime, strconv.Itoa(e.Node.Going), strconv.Itoa(e.Node.Waiting), e.Node.Group.ID, groupMap[e.Node.Group.ID].Name})
 			if err != nil {
 				log.Printf("failed to write data for event %s, %v", e.Node.ID, err)
 			}
