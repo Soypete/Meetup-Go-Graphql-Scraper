@@ -10,14 +10,11 @@ version: 1
 
 before:
   hooks:
-    # You may remove this if you don't use go modules.
-    - go mod tidy
 
 builds:
   - env:
-      - CGO_ENABLED=1
     goos:
-      # duckDB-go does not support windows
+      - windows
       - linux
       - darwin
 
