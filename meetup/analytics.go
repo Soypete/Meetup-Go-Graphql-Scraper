@@ -2,7 +2,6 @@ package meetup
 
 import (
 	"encoding/csv"
-	"fmt"
 	"log"
 	"os"
 	"strconv"
@@ -38,32 +37,49 @@ func (m Client) getGroups() map[string]groupAnalytics {
 	return groupMap
 }
 
-// TODO(soypete): maybe move the url here as a parameter to this function. The url is
-// coupled to the auth id and token, so it would also make sense as an environment variable.
-
-// BuildDataSet compiles the meetup.com groups and events data from a csv file used for analytics
-func (m Client) BuildDataSet() error {
+func (m Client) GetGroupData() {
 	groupMap := m.getGroups()
-	// eventMap := make(map[string]eventAnalytics)
-	csvFile, err := os.Create("temp-meetup.csv")
+	csvFile, err := os.Create("meetup_groups.csv")
 	if err != nil {
-		return fmt.Errorf("failed to create csv, %w", err)
+		log.Printf("failed to create csv, %v", err)
+	}
+	csvWriter := csv.NewWriter(csvFile)
+	err = csvWriter.Write([]string{"group_id", "group_name"})
+	if err != nil {
+		log.Printf("could not write headers to csv file, %v", err)
+		return
+	}
+	defer csvWriter.Flush()
+	for id, g := range groupMap {
+		err := csvWriter.Write([]string{id, g.Name})
+		if err != nil {
+			log.Printf("failed to write data for group %s, %v", id, err)
+		}
+	}
+}
+
+// GetEventRSVPData compiles the meetup.com groups and events data from a csv file used for analytics
+func (m Client) GetEventRSVPData() {
+	groupMap := m.getGroups()
+	csvFile, err := os.Create("event_RSVP.csv")
+	if err != nil {
+		log.Printf("failed to create csv, %v", err)
+		return
 	}
 	defer csvFile.Close()
 	csvWriter := csv.NewWriter(csvFile)
 	// write csv column names
 	err = csvWriter.Write([]string{"event_id", "title", "date", "rsvp_num_going", "rsvp_num_waitlist", "group_id", "group_name"})
 	if err != nil {
-		return fmt.Errorf("could not write headers to csv file, %w", err)
+		log.Printf("could not write headers to csv file, %v", err)
+		return
 	}
-	defer csvWriter.Flush()
 
 	var cursor string
 	hasNextPage := true
 	for hasNextPage {
 		events := m.GetListOfEvents(cursor)
 		for _, e := range events.Data.ProNetwork.EventsSearch.Edges {
-			// TODO: add headers to the csv file
 			err := csvWriter.Write([]string{e.Node.ID, e.Node.Title, e.Node.DateTime, strconv.Itoa(e.Node.Going), strconv.Itoa(e.Node.Waiting), e.Node.Group.ID, groupMap[e.Node.Group.ID].Name})
 			if err != nil {
 				log.Printf("failed to write data for event %s, %v", e.Node.ID, err)
@@ -73,5 +89,4 @@ func (m Client) BuildDataSet() error {
 		hasNextPage = events.Data.ProNetwork.EventsSearch.PageInfo.HasNextPage
 		csvWriter.Flush() // flushed after the pagination set
 	}
-	return nil
 }

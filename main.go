@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"sync"
 
 	"github.com/soypete/Metup-Go-Graphql-Scraper/auth"
 	"github.com/soypete/Metup-Go-Graphql-Scraper/meetup"
@@ -34,7 +35,9 @@ func parseConfig(file string) (Config, error) {
 
 func main() {
 	var configPath string
+	var analyticsFunc string
 	flag.StringVar(&configPath, "config-path", "config.json", "config file path")
+	flag.StringVar(&analyticsFunc, "analytics", "[groups, eventRSVP]", "function to run for analytics")
 	flag.Parse()
 
 	// parse config file
@@ -49,11 +52,19 @@ func main() {
 		log.Fatal(err)
 	}
 	meetupClient := meetup.Setup(bearerToken, parsedConfig.ProAccount)
-
-	// TODO(soypete): create csv with relevant data.
-	// for list of data in README.md
-	err = meetupClient.BuildDataSet()
+	listFuncs, err := meetupClient.GetAnalyticsFunc(analyticsFunc)
 	if err != nil {
 		log.Fatal(err)
 	}
+
+	wg := sync.WaitGroup{}
+	// run analytics function
+	wg.Add(len(listFuncs))
+	for _, f := range listFuncs {
+		go func(f func()) {
+			f()
+			defer wg.Done()
+		}(f)
+	}
+	wg.Wait()
 }
