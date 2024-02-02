@@ -17,7 +17,7 @@ func (m Client) getGroups() map[string]groupAnalytics {
 	hasNextPage := true
 	groupMap := make(map[string]groupAnalytics)
 	for hasNextPage {
-		groups, err := m.GetListOfGroups(cursor)
+		groups, err := m.getListOfGroups(cursor)
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -78,7 +78,7 @@ func (m Client) GetEventRSVPData() {
 	var cursor string
 	hasNextPage := true
 	for hasNextPage {
-		events := m.GetListOfEvents(cursor)
+		events := m.getListOfEvents(cursor)
 		for _, e := range events.Data.ProNetwork.EventsSearch.Edges {
 			err := csvWriter.Write([]string{e.Node.ID, e.Node.Title, e.Node.DateTime, strconv.Itoa(e.Node.Going), strconv.Itoa(e.Node.Waiting), e.Node.Group.ID, groupMap[e.Node.Group.ID].Name})
 			if err != nil {

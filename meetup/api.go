@@ -62,9 +62,9 @@ type EventsSearch struct {
 // TODO(soypete): edit variables
 func getInputandVariables(isFirst bool, lastCursor, urlname string, numPerPage int) (string, string) {
 	if isFirst {
-		return "input: {first: $itemsNum}", fmt.Sprintf(`{"urlname":"%s","itemsNum": %d}`, urlname, numPerPage)
+		return "input: {first: $itemsNum}", fmt.Sprintf(`{"urlname":"%s", "itemsNum":%d}`, urlname, numPerPage)
 	}
-	return "input: {first: $itemsNum, after: $cursor}", fmt.Sprintf(`{"urlname":"%s","itemsNum": %d,"cursor": "%s"}`, urlname, numPerPage, lastCursor)
+	return "input: {first: $itemsNum, after: $cursor}", fmt.Sprintf(`{"urlname":"%s", "itemsNum":%d, "cursor":"%s"}`, urlname, numPerPage, lastCursor)
 
 }
 
@@ -82,7 +82,7 @@ func makePayloadql(isGroup, isfirst bool, lastCursor, urlname string, numPerPage
 		nodeQuery = `name`
 	}
 
-	input, variables := getInputandVariables(isfirst, lastCursor, urlname, 3)
+	input, variables := getInputandVariables(isfirst, lastCursor, urlname, numPerPage)
 	query := fmt.Sprintf(queryTemplate, variableTypes, searchType, input, nodeQuery)
 	p := payloadql{
 		Query:     query,
@@ -90,7 +90,7 @@ func makePayloadql(isGroup, isfirst bool, lastCursor, urlname string, numPerPage
 	}
 	return p
 }
-func (c Client) GetListOfGroups(cursor string) (ProNetworkByUrlname, error) {
+func (c Client) getListOfGroups(cursor string) (ProNetworkByUrlname, error) {
 	isFirst := true
 	if cursor != "" {
 		isFirst = false
@@ -108,7 +108,7 @@ func (c Client) GetListOfGroups(cursor string) (ProNetworkByUrlname, error) {
 	return respData, nil
 }
 
-func (c Client) GetListOfEvents(cursor string) ProNetworkByUrlname {
+func (c Client) getListOfEvents(cursor string) ProNetworkByUrlname {
 	isFirst := true
 	if cursor != "" {
 		isFirst = false
@@ -144,6 +144,12 @@ func (c Client) sendRequest(ql payloadql) (resp []byte, err error) {
 	if err != nil {
 		return nil, fmt.Errorf("failed meetup.com api request, %w", err)
 	}
+	defer res.Body.Close()
+
+	if res.StatusCode >= 300 {
+		return nil, fmt.Errorf("meetup.com api request failed with status: %s", res.Status)
+	}
+
 	// TODO(soypete): check payload status
 	body, err := io.ReadAll(res.Body)
 	if err != nil {
