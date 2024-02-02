@@ -21,9 +21,8 @@ jobs:
     - name: Build
       run: go build -v ./...
 
-    - name: Generate coverage report
-      run: |
-           go test `go list ./... | grep -v examples` -coverprofile=coverage.txt -covermode=atomic
+    - name: Go Test
+      run: go test ./... -v -cover -covermode=atomic
 
     - name: Run GoReleaser
       uses: goreleaser/goreleaser-action@v5
