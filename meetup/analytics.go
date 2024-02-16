@@ -2,6 +2,7 @@ package meetup
 
 import (
 	"encoding/csv"
+	"fmt"
 	"log"
 	"os"
 	"strconv"
@@ -39,10 +40,40 @@ func (m Client) getGroups() map[string]groupAnalytics {
 
 func (m Client) GetGroupData() {
 	groupMap := m.getGroups()
+	csvFile, err := os.Create("meetup_groups_analytics.csv")
+	if err != nil {
+		log.Printf("failed to create csv, %v", err)
+	}
+
+	defer csvFile.Close()
+	csvWriter := csv.NewWriter(csvFile)
+	err = csvWriter.Write([]string{"group_id", "group_name", "group_url_key", "url", "status", "totalMembers", "lastEventDate", "averageAge",
+		"totalPastEvents", "totalPastRSVPs", "repeatRSVPers", "averageRSVPsPerEvent", "totalUpcomingEvents"})
+	if err != nil {
+		log.Printf("could not write headers to csv file, %v", err)
+		return
+	}
+	defer csvWriter.Flush()
+	for id, g := range groupMap {
+		group := m.getGroupByID(id)
+		err := csvWriter.Write([]string{id, g.Name, group.Data.Group.URLKey, group.Data.Group.Link, group.Data.Group.Status, strconv.Itoa(group.Data.Group.GroupAnalytics.totalMembers),
+			group.Data.Group.GroupAnalytics.lastEventDate, fmt.Sprintf("%f", group.Data.Group.GroupAnalytics.averageAge), strconv.Itoa(group.Data.Group.GroupAnalytics.totalPastEvents),
+			strconv.Itoa(group.Data.Group.GroupAnalytics.totalPastRSVPs), strconv.Itoa(group.Data.Group.GroupAnalytics.repeatRSVPers),
+			fmt.Sprintf("%f", group.Data.Group.GroupAnalytics.averageRSVPsPerEvent), strconv.Itoa(group.Data.Group.GroupAnalytics.totalUpcomingEvents)})
+		if err != nil {
+			log.Printf("failed to write data for group %s, %v", id, err)
+		}
+	}
+}
+
+// GetGroupList returns a list of meetup.com groups in a csv file
+func (m Client) GetGroupList() {
+	groupMap := m.getGroups()
 	csvFile, err := os.Create("meetup_groups.csv")
 	if err != nil {
 		log.Printf("failed to create csv, %v", err)
 	}
+	defer csvFile.Close()
 	csvWriter := csv.NewWriter(csvFile)
 	err = csvWriter.Write([]string{"group_id", "group_name"})
 	if err != nil {

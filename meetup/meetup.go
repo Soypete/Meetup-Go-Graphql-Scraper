@@ -33,7 +33,8 @@ func Setup(bearerToken string, proname string) Client {
 		bearerToken: bearerToken,
 		url:         "https://api.meetup.com/gql",
 	}
-	analyticsFuncs["groups"] = c.GetGroupData
+	analyticsFuncs["groups"] = c.GetGroupList
+	analyticsFuncs["groupAnalytics"] = c.GetGroupData
 	analyticsFuncs["eventRSVP"] = c.GetEventRSVPData
 	return c
 }
