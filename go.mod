@@ -1,4 +1,4 @@
-module github.com/soypete/Metup-Go-Graphql-Scraper
+module github.com/soypete/Meetup-Go-Graphql-Scraper
 
 go 1.21
 

@@ -8,8 +8,8 @@ import (
 	"os"
 	"sync"
 
-	"github.com/soypete/Metup-Go-Graphql-Scraper/auth"
-	"github.com/soypete/Metup-Go-Graphql-Scraper/meetup"
+	"github.com/soypete/Meetup-Go-Graphql-Scraper/auth"
+	"github.com/soypete/Meetup-Go-Graphql-Scraper/meetup"
 )
 
 type Config struct {
