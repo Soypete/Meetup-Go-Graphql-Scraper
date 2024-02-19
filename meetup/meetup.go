@@ -15,6 +15,7 @@ type Client struct {
 	proname     string
 	ql          *http.Client
 	bearerToken string
+	filesDir    string
 	url         string
 }
 
@@ -27,7 +28,7 @@ var (
 // The proname is the name of the project that is using the Meetup API.
 // the client is returned with all credentials and implemented analytics functions needed to
 // create analytics files.
-func Setup(bearerToken string, proname string) Client {
+func Setup(bearerToken, proname, directory string) Client {
 	// TODO: add check for valid bearerToken
 	analyticsFuncs = make(map[string]func())
 	c := Client{
@@ -35,6 +36,7 @@ func Setup(bearerToken string, proname string) Client {
 		ql: &http.Client{
 			Timeout: 10 * time.Second,
 		},
+		filesDir:    directory,
 		bearerToken: bearerToken,
 		url:         "https://api.meetup.com/gql",
 	}
