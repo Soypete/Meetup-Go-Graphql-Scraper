@@ -131,14 +131,14 @@ type Group struct {
 			Link           string `json:"link"`
 			Status         string `json:"status"`
 			GroupAnalytics struct {
-				totalMembers         int     `json:"totalMembers,omitempty"`
-				lastEventDate        string  `json:"lastEventDate,omitempty"`
-				averageAge           float64 `json:"averageAge,omitempty"`
-				totalPastEvents      int     `json:"totalPastEvents,omitempty"`
-				totalPastRSVPs       int     `json:"totalPastRSVPs,omitempty"`
-				repeatRSVPers        int     `json:"repeatRSVPers,omitempty"`
-				averageRSVPsPerEvent float64 `json:"averageRSVPsPerEvent,omitempty"`
-				totalUpcomingEvents  int     `json:"totalUpcomingEvents,omitempty"`
+				TotalMembers         int     `json:"totalMembers,omitempty"`
+				LastEventDate        string  `json:"lastEventDate,omitempty"`
+				AverageAge           float64 `json:"averageAge,omitempty"`
+				TotalPastEvents      int     `json:"totalPastEvents,omitempty"`
+				TotalPastRSVPs       int     `json:"totalPastRSVPs,omitempty"`
+				RepeatRSVPers        int     `json:"repeatRSVPers,omitempty"`
+				AverageRSVPsPerEvent float64 `json:"averageRSVPsPerEvent,omitempty"`
+				TotalUpcomingEvents  int     `json:"totalUpcomingEvents,omitempty"`
 			} `json:"groupAnalytics,omitempty"`
 		} `json:"group"`
 	} `json:"data"`

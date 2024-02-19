@@ -21,6 +21,12 @@ jobs:
     - name: Build
       run: go build -v ./...
 
+    - name: golangci-lint
+      uses: golangci/golangci-lint-action@v4 
+      with:
+        only-new-issues: true
+        skip-cache: true
+
     - name: Go Test
       run: go test ./... -v -cover -covermode=atomic
 
