@@ -44,7 +44,7 @@ func (m Client) getGroups() map[string]groupAnalytics {
 // Data is exported to a csv file `meetup_groups_analytics.csv`
 func (m Client) GetGroupData() {
 	groupMap := m.getGroups()
-	csvFile, err := os.Create("meetup_groups_analytics.csv")
+	csvFile, err := os.Create(m.filesDir + "/meetup_groups_analytics.csv")
 	if err != nil {
 		log.Printf("failed to create csv, %v", err)
 	}
@@ -74,7 +74,7 @@ func (m Client) GetGroupData() {
 // `meetup_groups.csv`
 func (m Client) GetGroupList() {
 	groupMap := m.getGroups()
-	csvFile, err := os.Create("meetup_groups.csv")
+	csvFile, err := os.Create(m.filesDir + "/meetup_groups.csv")
 	if err != nil {
 		log.Printf("failed to create csv, %v", err)
 	}
@@ -98,7 +98,7 @@ func (m Client) GetGroupList() {
 // `event_RSVP.csv`
 func (m Client) GetEventRSVPData() {
 	groupMap := m.getGroups()
-	csvFile, err := os.Create("event_RSVP.csv")
+	csvFile, err := os.Create(m.filesDir + "event_RSVP.csv")
 	if err != nil {
 		log.Printf("failed to create csv, %v", err)
 		return

@@ -5,7 +5,7 @@ import (
 )
 
 func TestGetAnalyticsFuncs(t *testing.T) {
-	client := Setup("1234", "test")
+	client := Setup("1234", "test", "csv")
 	tests := []struct {
 		name    string
 		m       *Client

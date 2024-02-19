@@ -26,6 +26,7 @@ go run meetup-go-grapghl-scraper -config-path=config.json -analytics=[groups, ev
 the flags are:
 - config-path: the path to the config file
 - analytics: the function to run for analytics
+- file-dir: the directory to save csv files. ex: /tmp
 
 */
 
@@ -67,8 +68,10 @@ func parseConfig(file string) (Config, error) {
 func main() {
 	var configPath string
 	var analyticsFunc string
+	var filesDir string
 	flag.StringVar(&configPath, "config-path", "config.json", "config file path")
 	flag.StringVar(&analyticsFunc, "analytics", "[groups, eventRSVP]", "function to run for analytics")
+	flag.StringVar(&filesDir, "file-dir", "", "directory to save csv files. ex: /tmp")
 	flag.Parse()
 
 	// parse config file
@@ -82,7 +85,7 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	meetupClient := meetup.Setup(bearerToken, parsedConfig.ProAccount)
+	meetupClient := meetup.Setup(bearerToken, parsedConfig.ProAccount, filesDir)
 	listFuncs, err := meetupClient.GetAnalyticsFunc(analyticsFunc)
 	if err != nil {
 		log.Fatal(err)
