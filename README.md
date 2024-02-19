@@ -2,8 +2,22 @@
 
 Generate monthly analytics reports for YTD meetup events held, rsvps per event, number speakers, etc
 
-[![Actions Status](https://github.com/soypete/{}/workflows/build/badge.svg)](https://github.com/soypete/{}/actions/workflows/go.yml)
-[![codecov](https://codecov.io/gh/soypete/{}/branch/master/graph/badge.svg)](https://codecov.io/gh/soypete/{})
+[![Actions Status](https://github.com/soypete/meetup-go-graphql-scraper/workflows/build/badge.svg)](https://github.com/soypete/meetup-go-graphql-scraper/actions/workflows/go.yml)
+[![Go Reference](https://pkg.go.dev/badge/github.com/soypete/Meetup-Go-Graphql-Scraper@v0.1.1.svg)](https://pkg.go.dev/github.com/soypete/Meetup-Go-Graphql-Scraper@v0.1.1)
+
+# Install
+
+## Go env
+
+Run this command when you have working go environment.
+
+```bash
+go install github.com/soypete/Meetup-Go-Graphql-Scraper@latest
+```
+
+## No Go env
+
+Instructions coming soon
 
 # Setup
 
