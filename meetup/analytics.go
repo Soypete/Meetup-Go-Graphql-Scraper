@@ -60,10 +60,10 @@ func (m Client) GetGroupData() {
 	defer csvWriter.Flush()
 	for id, g := range groupMap {
 		group := m.getGroupByID(id)
-		err := csvWriter.Write([]string{id, g.Name, group.Data.Group.URLKey, group.Data.Group.Link, group.Data.Group.Status, strconv.Itoa(group.Data.Group.GroupAnalytics.totalMembers),
-			group.Data.Group.GroupAnalytics.lastEventDate, fmt.Sprintf("%f", group.Data.Group.GroupAnalytics.averageAge), strconv.Itoa(group.Data.Group.GroupAnalytics.totalPastEvents),
-			strconv.Itoa(group.Data.Group.GroupAnalytics.totalPastRSVPs), strconv.Itoa(group.Data.Group.GroupAnalytics.repeatRSVPers),
-			fmt.Sprintf("%f", group.Data.Group.GroupAnalytics.averageRSVPsPerEvent), strconv.Itoa(group.Data.Group.GroupAnalytics.totalUpcomingEvents)})
+		err := csvWriter.Write([]string{id, g.Name, group.Data.Group.URLKey, group.Data.Group.Link, group.Data.Group.Status, strconv.Itoa(group.Data.Group.GroupAnalytics.TotalMembers),
+			group.Data.Group.GroupAnalytics.LastEventDate, fmt.Sprintf("%f", group.Data.Group.GroupAnalytics.AverageAge), strconv.Itoa(group.Data.Group.GroupAnalytics.TotalPastEvents),
+			strconv.Itoa(group.Data.Group.GroupAnalytics.TotalPastRSVPs), strconv.Itoa(group.Data.Group.GroupAnalytics.RepeatRSVPers),
+			fmt.Sprintf("%f", group.Data.Group.GroupAnalytics.AverageRSVPsPerEvent), strconv.Itoa(group.Data.Group.GroupAnalytics.TotalUpcomingEvents)})
 		if err != nil {
 			log.Printf("failed to write data for group %s, %v", id, err)
 		}
