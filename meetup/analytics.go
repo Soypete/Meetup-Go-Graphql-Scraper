@@ -38,6 +38,10 @@ func (m Client) getGroups() map[string]groupAnalytics {
 	return groupMap
 }
 
+// GetGroupData returns a csv file with data from the meetup.com
+// [groupsAnalytics payload](https://www.meetup.com/api/schema/#GroupAnalytics).
+// This data is only available when you query the groups endpoint with the ID of the group.
+// Data is exported to a csv file `meetup_groups_analytics.csv`
 func (m Client) GetGroupData() {
 	groupMap := m.getGroups()
 	csvFile, err := os.Create("meetup_groups_analytics.csv")
@@ -67,6 +71,7 @@ func (m Client) GetGroupData() {
 }
 
 // GetGroupList returns a list of meetup.com groups in a csv file
+// `meetup_groups.csv`
 func (m Client) GetGroupList() {
 	groupMap := m.getGroups()
 	csvFile, err := os.Create("meetup_groups.csv")
@@ -89,7 +94,8 @@ func (m Client) GetGroupList() {
 	}
 }
 
-// GetEventRSVPData compiles the meetup.com groups and events data from a csv file used for analytics
+// GetEventRSVPData compiles the meetup.com groups and events data from a csv file
+// `event_RSVP.csv`
 func (m Client) GetEventRSVPData() {
 	groupMap := m.getGroups()
 	csvFile, err := os.Create("event_RSVP.csv")

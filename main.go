@@ -1,3 +1,34 @@
+/*
+Meetup-Go-Graphql-Scraper is a tool to scrape data from Meetup.com using their GraphQL API.
+It allows users to specify which analytics function to run and will output the results to a file.
+The current analytics functions are:
+- groups: list all the groups associate to a pro account
+- eventRSVP: list all the RSVPs for a events in a pro account
+- groupAnalytics: export of group analytics data as provided by Meetup.com. So far this has been empty for all groups.
+
+The Kolla integration tool us used to authenticate with Meetup.com and get a bearer token for meetup.com's OAuth2 API.
+To use this tool, you will need to have a Kolla account and a Meetup.com pro account, as well as a config file with the following fields:
+
+```
+{
+  "pro_account": "go",
+  "kolla_key": {kolla.secret},
+  "connector_id": {kolla.account},
+  "consumer_id": {kolla.key}
+}
+```
+
+usage:
+```
+go run meetup-go-grapghl-scraper -config-path=config.json -analytics=[groups, eventRSVP]
+```
+
+the flags are:
+- config-path: the path to the config file
+- analytics: the function to run for analytics
+
+*/
+
 package main
 
 import (

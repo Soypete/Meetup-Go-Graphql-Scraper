@@ -15,6 +15,8 @@ type payloadql struct {
 	Variables string `json:"variables"`
 }
 
+// ProNetworkByUrlname is the response from the graphql api
+// https://www.meetup.com/api/schema/#proNetworkByUrlname.
 type ProNetworkByUrlname struct {
 	Data struct {
 		ProNetwork struct {
@@ -23,6 +25,9 @@ type ProNetworkByUrlname struct {
 		} `json:"proNetworkByUrlname"`
 	} `json:"data"`
 }
+
+// GroupsSearch is the response from the graphql api
+// https://www.meetup.com/api/schema/#GroupEventSearchConnection
 type GroupsSearch struct {
 	Count    int `json:"count"`
 	PageInfo struct {
@@ -33,9 +38,14 @@ type GroupsSearch struct {
 	Edges []Edge `json:"edges"`
 }
 
+// Edge is the response from the graphql api
+// https://www.meetup.com/api/schema/#GroupEventEdge
 type Edge struct {
 	Node Node `json:"node"`
 }
+
+// Node is the response from the graphql api
+// https://www.meetup.com/api/schema/#Event
 type Node struct {
 	ID    string `json:"id"`
 	Title string `json:"title,omitempty"`
@@ -49,6 +59,8 @@ type Node struct {
 	Waiting  int    `json:"waiting,omitempty"`
 }
 
+// EventsSearch is the response from the graphql api
+// https://www.meetup.com/api/schema/#ProNetworkEventsConnection
 type EventsSearch struct {
 	Count    int `json:"count"`
 	PageInfo struct {
@@ -59,7 +71,6 @@ type EventsSearch struct {
 	Edges []Edge `json:"edges"`
 }
 
-// TODO(soypete): edit variables
 func getInputandVariables(isFirst bool, lastCursor, urlname string, numPerPage int) (string, string) {
 	if isFirst {
 		return "input: {first: $itemsNum}", fmt.Sprintf(`{"urlname":"%s", "itemsNum":%d}`, urlname, numPerPage)
@@ -90,6 +101,7 @@ func makePayloadql(isGroup, isfirst bool, lastCursor, urlname string, numPerPage
 	}
 	return p
 }
+
 func (c Client) getListOfGroups(cursor string) (ProNetworkByUrlname, error) {
 	isFirst := true
 	if cursor != "" {
@@ -108,6 +120,8 @@ func (c Client) getListOfGroups(cursor string) (ProNetworkByUrlname, error) {
 	return respData, nil
 }
 
+// Group is the response from the graphql api
+// https://www.meetup.com/api/schema/#Group
 type Group struct {
 	Data struct {
 		Group struct {

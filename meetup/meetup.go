@@ -14,7 +14,7 @@ import (
 type Client struct {
 	proname     string
 	ql          *http.Client
-	bearerToken string //TODO(soypete): refresh
+	bearerToken string
 	url         string
 }
 
@@ -22,6 +22,11 @@ var (
 	analyticsFuncs map[string]func()
 )
 
+// Setup initializes the Meetup client with impletented analytics functions.
+// The bearerToken is the token used to authenticate with the Meetup API.
+// The proname is the name of the project that is using the Meetup API.
+// the client is returned with all credentials and implemented analytics functions needed to
+// create analytics files.
 func Setup(bearerToken string, proname string) Client {
 	// TODO: add check for valid bearerToken
 	analyticsFuncs = make(map[string]func())
@@ -39,6 +44,8 @@ func Setup(bearerToken string, proname string) Client {
 	return c
 }
 
+// GetAnalyticsFunc returns a list of analytics functions that provided
+// via the command line flag.
 func (m Client) GetAnalyticsFunc(funcs string) ([]func(), error) {
 	funcs = strings.Trim(funcs, "[]")
 	funcsList := strings.Split(funcs, ",")
@@ -47,7 +54,6 @@ func (m Client) GetAnalyticsFunc(funcs string) ([]func(), error) {
 		key := strings.Trim(f, " ")
 		if _, ok := analyticsFuncs[key]; !ok {
 			return nil, fmt.Errorf("invalid flag: %s", key)
-			// TODO: return an error for invalid flad
 		}
 		queuedFuncs = append(queuedFuncs, analyticsFuncs[key])
 	}

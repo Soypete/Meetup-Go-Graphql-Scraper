@@ -7,12 +7,14 @@ import (
 	kolla "github.com/kollalabs/sdk-go/kc"
 )
 
+// KollaConnect is a struct that holds the key, consumerID and connectorID.
 type KollaConnect struct {
 	key         string
 	consumerID  string
 	connectorID string
 }
 
+// Setup is a function that returns a new KollaConnect struct.
 func Setup(key, consumerID, connectorID string) *KollaConnect {
 	return &KollaConnect{
 		key:         key,
@@ -21,6 +23,8 @@ func Setup(key, consumerID, connectorID string) *KollaConnect {
 	}
 }
 
+// GetBearerToken is a function that uses the kolla connect client to get the meetup api
+// oauth credentials.
 func (kc *KollaConnect) GetBearerToken() (string, error) {
 	// Get api key from environment variable
 
